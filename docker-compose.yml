@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  blog-nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8976:80"
+      - "8977:443"
+    restart: unless-stopped
+    volumes:
+      - ./src:/var/www/html
+
+  db:
+    image: 'mariadb'
+    restart: always
+    volumes:
+      # Pour lancer un dump automatiquement au montage du conteneur
+      - ./database/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      MYSQL_DATABASE: data
+      MYSQL_ROOT_PASSWORD: password
+
+
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - '8988:80'
+    environment:
+      - PMA_ARBITRARY=1
+
+volumes:
+  data:
